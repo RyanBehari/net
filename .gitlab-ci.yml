@@ -1,0 +1,30 @@
+name: Pull kindest/node image and save as artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_ref:
+        description: 'Full image ref (repo:tag@sha256:digest)'
+        required: true
+        default: 'kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0'
+
+jobs:
+  pull-and-save:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull image
+        run: docker pull "${{ inputs.image_ref }}"
+
+      - name: Save image to tar
+        run: |
+          # Sanitize ref for filename (strip slashes/colons/@)
+          SAFE_NAME=$(echo "${{ inputs.image_ref }}" | sed 's/[\/:@]/_/g')
+          docker save -o "${SAFE_NAME}.tar" "${{ inputs.image_ref }}"
+          echo "ARTIFACT_NAME=${SAFE_NAME}" >> "$GITHUB_ENV"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}.tar
+          retention-days: 3
