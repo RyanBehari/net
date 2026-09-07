@@ -1,4 +1,4 @@
-name: Pull kindest/node image and save as artifact
+name: Pull kindest/node image and publish as release
 
 on:
   workflow_dispatch:
@@ -8,8 +8,11 @@ on:
         required: true
         default: 'kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0'
 
+permissions:
+  contents: write   # needed to create a release and upload assets
+
 jobs:
-  pull-and-save:
+  pull-and-release:
     runs-on: ubuntu-latest
     steps:
       - name: Pull image
@@ -22,9 +25,11 @@ jobs:
           docker save -o "${SAFE_NAME}.tar" "${{ inputs.image_ref }}"
           echo "ARTIFACT_NAME=${SAFE_NAME}" >> "$GITHUB_ENV"
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Create release with tar as asset
+        uses: softprops/action-gh-release@v2
         with:
+          tag_name: image-${{ env.ARTIFACT_NAME }}-${{ github.run_id }}
           name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.ARTIFACT_NAME }}.tar
-          retention-days: 3
+          body: |
+            Docker image tar for `${{ inputs.image_ref }}`, built by run ${{ github.run_id }}.
+          files: ${{ env.ARTIFACT_NAME }}.tar
