@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  download-nexus:
+  download-and-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,30 +35,23 @@ jobs:
             -o nexus-3.88.0-08-win-x86_64.zip \
             https://download.sonatype.com/nexus/3/nexus-3.88.0-08-win-x86_64.zip
 
-      - name: Upload Nexus 3.96.4
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: nexus-3.96.4-01-win-x86_64
-          path: nexus-3.96.4-01-win-x86_64.zip
-          retention-days: 90
+          tag_name: nexus-versions
+          name: Nexus Repository Versions
+          body: |
+            Nexus Repository Windows x86_64 releases.
 
-      - name: Upload Nexus 3.95.4
-        uses: actions/upload-artifact@v4
-        with:
-          name: nexus-3.95.4-01-win-x86_64
-          path: nexus-3.95.4-01-win-x86_64.zip
-          retention-days: 90
-
-      - name: Upload Nexus 3.94.2
-        uses: actions/upload-artifact@v4
-        with:
-          name: nexus-3.94.2-01-win-x86_64
-          path: nexus-3.94.2-01-win-x86_64.zip
-          retention-days: 90
-
-      - name: Upload Nexus 3.88.0
-        uses: actions/upload-artifact@v4
-        with:
-          name: nexus-3.88.0-08-win-x86_64
-          path: nexus-3.88.0-08-win-x86_64.zip
-          retention-days: 90
+            Included versions:
+            - Nexus 3.96.4
+            - Nexus 3.95.4
+            - Nexus 3.94.2
+            - Nexus 3.88.0
+          prerelease: false
+          make_latest: false
+          files: |
+            nexus-3.96.4-01-win-x86_64.zip
+            nexus-3.95.4-01-win-x86_64.zip
+            nexus-3.94.2-01-win-x86_64.zip
+            nexus-3.88.0-08-win-x86_64.zip
