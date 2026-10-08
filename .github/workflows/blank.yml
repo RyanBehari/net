@@ -1,35 +1,64 @@
-name: Pull kindest/node image and publish as release
+name: Download Nexus Repository Releases
 
 on:
   workflow_dispatch:
-    inputs:
-      image_ref:
-        description: 'Full image ref (repo:tag@sha256:digest)'
-        required: true
-        default: 'kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0'
 
 permissions:
-  contents: write   # needed to create a release and upload assets
+  contents: read
 
 jobs:
-  pull-and-release:
+  download-nexus:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Pull image
-        run: docker pull "${{ inputs.image_ref }}"
-
-      - name: Save image to tar
+      - name: Download Nexus 3.96.4
         run: |
-          # Sanitize ref for filename (strip slashes/colons/@)
-          SAFE_NAME=$(echo "${{ inputs.image_ref }}" | sed 's/[\/:@]/_/g')
-          docker save -o "${SAFE_NAME}.tar" "${{ inputs.image_ref }}"
-          echo "ARTIFACT_NAME=${SAFE_NAME}" >> "$GITHUB_ENV"
+          curl -fL \
+            -o nexus-3.96.4-01-win-x86_64.zip \
+            https://download.sonatype.com/nexus/3/nexus-3.96.4-01-win-x86_64.zip
 
-      - name: Create release with tar as asset
-        uses: softprops/action-gh-release@v2
+      - name: Download Nexus 3.95.4
+        run: |
+          curl -fL \
+            -o nexus-3.95.4-01-win-x86_64.zip \
+            https://download.sonatype.com/nexus/3/nexus-3.95.4-01-win-x86_64.zip
+
+      - name: Download Nexus 3.94.2
+        run: |
+          curl -fL \
+            -o nexus-3.94.2-01-win-x86_64.zip \
+            https://download.sonatype.com/nexus/3/nexus-3.94.2-01-win-x86_64.zip
+
+      - name: Download Nexus 3.88.0
+        run: |
+          curl -fL \
+            -o nexus-3.88.0-08-win-x86_64.zip \
+            https://download.sonatype.com/nexus/3/nexus-3.88.0-08-win-x86_64.zip
+
+      - name: Upload Nexus 3.96.4
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: image-${{ env.ARTIFACT_NAME }}-${{ github.run_id }}
-          name: ${{ env.ARTIFACT_NAME }}
-          body: |
-            Docker image tar for `${{ inputs.image_ref }}`, built by run ${{ github.run_id }}.
-          files: ${{ env.ARTIFACT_NAME }}.tar
+          name: nexus-3.96.4-01-win-x86_64
+          path: nexus-3.96.4-01-win-x86_64.zip
+          retention-days: 90
+
+      - name: Upload Nexus 3.95.4
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-3.95.4-01-win-x86_64
+          path: nexus-3.95.4-01-win-x86_64.zip
+          retention-days: 90
+
+      - name: Upload Nexus 3.94.2
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-3.94.2-01-win-x86_64
+          path: nexus-3.94.2-01-win-x86_64.zip
+          retention-days: 90
+
+      - name: Upload Nexus 3.88.0
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-3.88.0-08-win-x86_64
+          path: nexus-3.88.0-08-win-x86_64.zip
+          retention-days: 90
