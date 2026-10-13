@@ -1,4 +1,5 @@
-name: Download Nexus Repository Releases
+```yaml
+name: Download Portable NuGet and Conda Tools
 
 on:
   workflow_dispatch:
@@ -8,50 +9,37 @@ permissions:
 
 jobs:
   download-and-release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-      - name: Download Nexus 3.96.4
+      - name: Download portable NuGet
+        shell: pwsh
         run: |
-          curl -fL \
-            -o nexus-3.96.4-01-win-x86_64.zip \
-            https://download.sonatype.com/nexus/3/nexus-3.96.4-01-win-x86_64.zip
+          Invoke-WebRequest `
+            -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" `
+            -OutFile "nuget.exe"
 
-      - name: Download Nexus 3.95.4
+      - name: Download portable micromamba (Conda)
+        shell: pwsh
         run: |
-          curl -fL \
-            -o nexus-3.95.4-01-win-x86_64.zip \
-            https://download.sonatype.com/nexus/3/nexus-3.95.4-01-win-x86_64.zip
-
-      - name: Download Nexus 3.94.2
-        run: |
-          curl -fL \
-            -o nexus-3.94.2-01-win-x86_64.zip \
-            https://download.sonatype.com/nexus/3/nexus-3.94.2-01-win-x86_64.zip
-
-      - name: Download Nexus 3.88.0
-        run: |
-          curl -fL \
-            -o nexus-3.88.0-08-win-x86_64.zip \
-            https://download.sonatype.com/nexus/3/nexus-3.88.0-08-win-x86_64.zip
+          Invoke-WebRequest `
+            -Uri "https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-win-64" `
+            -OutFile "micromamba.exe"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: nexus-versions
-          name: Nexus Repository Versions
+          tag_name: portable-client-tools
+          name: Portable NuGet and Conda Tools
           body: |
-            Nexus Repository Windows x86_64 releases.
+            Portable Windows command-line tools.
 
-            Included versions:
-            - Nexus 3.96.4
-            - Nexus 3.95.4
-            - Nexus 3.94.2
-            - Nexus 3.88.0
+            Included:
+            - nuget.exe (NuGet CLI)
+            - micromamba.exe (Conda-compatible package manager)
           prerelease: false
           make_latest: false
           files: |
-            nexus-3.96.4-01-win-x86_64.zip
-            nexus-3.95.4-01-win-x86_64.zip
-            nexus-3.94.2-01-win-x86_64.zip
-            nexus-3.88.0-08-win-x86_64.zip
+            nuget.exe
+            micromamba.exe
+```
