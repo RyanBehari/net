@@ -1,5 +1,5 @@
 ```yaml
-name: Download Portable NuGet and Conda Tools
+name: Download NuGet and Conda
 
 on:
   workflow_dispatch:
@@ -8,38 +8,30 @@ permissions:
   contents: write
 
 jobs:
-  download-and-release:
+  download-tools:
     runs-on: windows-latest
 
     steps:
-      - name: Download portable NuGet
+      - name: Download NuGet
         shell: pwsh
         run: |
           Invoke-WebRequest `
             -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" `
             -OutFile "nuget.exe"
 
-      - name: Download portable micromamba (Conda)
+      - name: Download Conda (micromamba)
         shell: pwsh
         run: |
           Invoke-WebRequest `
             -Uri "https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-win-64" `
             -OutFile "micromamba.exe"
 
-      - name: Create GitHub Release
+      - name: Release portable tools
         uses: softprops/action-gh-release@v2
         with:
           tag_name: portable-client-tools
           name: Portable NuGet and Conda Tools
-          body: |
-            Portable Windows command-line tools.
-
-            Included:
-            - nuget.exe (NuGet CLI)
-            - micromamba.exe (Conda-compatible package manager)
-          prerelease: false
-          make_latest: false
+          body: Portable Windows executables for NuGet and Conda.
           files: |
             nuget.exe
             micromamba.exe
-```
