@@ -1,4 +1,4 @@
-name: Portable NuGet and Conda
+name: GitLab Runner Helper TAR
 
 on:
   workflow_dispatch:
@@ -7,24 +7,25 @@ permissions:
   contents: write
 
 jobs:
-  download-tools:
-    runs-on: windows-latest
+  export-runner-helper:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Download NuGet
-        shell: pwsh
-        run: Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile "nuget.exe"
+      - name: Pull GitLab Runner Helper image
+        run: |
+          docker pull gitlab/gitlab-runner-helper:alpine3.21-x86_64-v19.4.1
 
-      - name: Download micromamba
-        shell: pwsh
-        run: Invoke-WebRequest -Uri "https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-win-64" -OutFile "micromamba.exe"
+      - name: Export Docker image to TAR
+        run: |
+          docker save \
+            -o gitlab-runner-helper-alpine3.21-v19.4.1.tar \
+            gitlab/gitlab-runner-helper:alpine3.21-x86_64-v19.4.1
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: portable-client-tools
-          name: Portable NuGet and Conda
-          body: "Portable Windows executables: NuGet CLI and micromamba."
+          tag_name: gitlab-runner-helper-v19.4.1
+          name: GitLab Runner Helper v19.4.1
+          body: "GitLab Runner Helper Docker image exported as a TAR archive for offline use."
           files: |
-            nuget.exe
-            micromamba.exe
+            gitlab-runner-helper-alpine3.21-v19.4.1.tar
