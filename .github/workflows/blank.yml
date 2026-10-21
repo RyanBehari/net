@@ -1,4 +1,5 @@
-name: GitLab Runner Helper TAR
+```yaml
+name: Apache Answer TAR.GZ
 
 on:
   workflow_dispatch:
@@ -7,25 +8,22 @@ permissions:
   contents: write
 
 jobs:
-  export-runner-helper:
+  export-answer:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Pull GitLab Runner Helper image
+      - name: Download Apache Answer archive
         run: |
-          docker pull gitlab/gitlab-runner-helper:alpine3.21-x86_64-v19.4.1
-
-      - name: Export Docker image to TAR
-        run: |
-          docker save \
-            -o gitlab-runner-helper-alpine3.21-v19.4.1.tar \
-            gitlab/gitlab-runner-helper:alpine3.21-x86_64-v19.4.1
+          curl -fL \
+            "https://www.apache.org/dyn/closer.lua/answer/2.0.3/apache-answer-2.0.3-bin-linux-amd64.tar.gz?action=download" \
+            -o apache-answer-2.0.3-bin-linux-amd64.tar.gz
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: gitlab-runner-helper-v19.4.1
-          name: GitLab Runner Helper v19.4.1
-          body: "GitLab Runner Helper Docker image exported as a TAR archive for offline use."
+          tag_name: apache-answer-v2.0.3
+          name: Apache Answer v2.0.3
+          body: "Apache Answer 2.0.3 Linux AMD64 binary distribution, packaged as a TAR.GZ archive for offline use."
           files: |
-            gitlab-runner-helper-alpine3.21-v19.4.1.tar
+            apache-answer-2.0.3-bin-linux-amd64.tar.gz
+```
