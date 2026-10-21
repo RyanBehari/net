@@ -1,4 +1,3 @@
-```yaml
 name: Apache Answer TAR.GZ
 
 on:
@@ -26,4 +25,3 @@ jobs:
           body: "Apache Answer 2.0.3 Linux AMD64 binary distribution, packaged as a TAR.GZ archive for offline use."
           files: |
             apache-answer-2.0.3-bin-linux-amd64.tar.gz
-```
